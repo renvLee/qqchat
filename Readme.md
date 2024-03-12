@@ -2,7 +2,7 @@
 
 主界面（QToolBox）、聊天窗口界面（QWidget）通过点击主界面的群成员的头像控制群成员聊天界面的弹出
 
-![image-20240312175659936](./assets/Readme/image-20240312175659936.png)
+![image-20240312175659936](assets/Readme/image-20240312175659936.png)
 
 ![image-20240312183509620](./assets/Readme/image-20240312183509620.png)
 
