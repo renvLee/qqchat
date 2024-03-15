@@ -16,7 +16,7 @@ class Client : public QDialog
     Q_OBJECT
     
 public:
-    explicit Client(QWidget *parent = 0);
+    explicit Client(QWidget *parent = 0);//表明该构造函数是显示的, 而非隐式的
     ~Client();
 
     void setHostAddr(QHostAddress addr);
