@@ -101,7 +101,9 @@ Drawer::Drawer(QWidget *parent, Qt::WindowFlags f)
 void Drawer::showChatWidget1()
 {
     chatWidget1 = new Widget(0,toolBtn1->text());
+    //toolBtn1的文本信息作为新窗口的标题
     chatWidget1->setWindowTitle(toolBtn1->text());
+    //toolBtn1的图标为新窗口的图标
     chatWidget1->setWindowIcon(toolBtn1->icon());
     chatWidget1->show();
 }

@@ -13,7 +13,15 @@
 #include <QFileDialog>
 
 #include <QColorDialog>
-
+/*
+ * @brief   : 1、用户登录，退出，发送消息时，使用UDP广播告知所有用户
+              2、传输文件时，用户聊天窗口视为不同角色。分别扮演服务器或者客户端（P2P)
+                2.1、服务器在发送文件前首先利用UDP发送其文件名
+                2.2、如果客户端拒绝接收该文件，也利用UDP返回拒绝应答
+                2.3、如果客户端同意接受该文件，则服务器会利用一个TCP连接向客户端传输文件
+ * @author  :Lengde
+ * @date    :2024.03.16
+ */
 Widget::Widget(QWidget *parent,QString usrname) :
     QWidget(parent),
     ui(new Ui::Widget)
@@ -21,9 +29,10 @@ Widget::Widget(QWidget *parent,QString usrname) :
     ui->setupUi(this);
 
     uName = usrname;
-    udpSocket = new QUdpSocket(this);
+    udpSocket = new QUdpSocket(this);//初始化UDP套接字
     port = 23232;
     udpSocket->bind(port, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint);
+    //槽函数绑定，随时接收来自其他用户的UDP广播消息
     connect(udpSocket, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
     sndMsg(UsrEnter);
 
@@ -38,12 +47,18 @@ Widget::~Widget()
     delete ui;
 }
 
+/*
+ * @brief   :发送UDP广播消息
+ *          消息类型设计:聊天信息、新用户加入、用户退出、文件名、拒绝接收文件
+ * @author  :Lengde
+ * @date    :2024.03.16
+ */
 void Widget::sndMsg(MsgType type, QString srvaddr)
 {
     QByteArray data;
     QDataStream out(&data, QIODevice::WriteOnly);
     QString address = getIP();
-    out << type << getUsr();
+    out << type << getUsr();//向要发送的数据中写入信息类型、用户名
 
     switch(type)
     {
@@ -74,18 +89,23 @@ void Widget::sndMsg(MsgType type, QString srvaddr)
         out << srvaddr;
         break;
     }
+    //完成对信息的处理后，最后使用writeDatagram（）进行UDP广播
     udpSocket->writeDatagram(data,data.length(),QHostAddress::Broadcast, port);
 }
 
 void Widget::processPendingDatagrams()
 {
+    //判断是否有供读取的数据
     while(udpSocket->hasPendingDatagrams())
     {
         QByteArray datagram;
+        //pendingDatagramSize()获取当前可供读取的UDP报文大小，并分配接收缓冲区
         datagram.resize(udpSocket->pendingDatagramSize());
+        //readDatagram（）读取相应数据
         udpSocket->readDatagram(datagram.data(), datagram.size());
         QDataStream in(&datagram, QIODevice::ReadOnly);
         int msgType;
+        //获取信息类型
         in >> msgType;
         QString usrName,ipAddr,msg;
         QString time = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");

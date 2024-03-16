@@ -17,13 +17,13 @@ public:
     explicit Widget(QWidget *parent,QString usrname);
     ~Widget();
 protected:
-    void usrEnter(QString usrname,QString ipaddr);
-    void usrLeft(QString usrname,QString time);
-    void sndMsg(MsgType type, QString srvaddr="");
+    void usrEnter(QString usrname,QString ipaddr);//处理新用户加入
+    void usrLeft(QString usrname,QString time);//处理用户离开
+    void sndMsg(MsgType type, QString srvaddr="");//广播UDP消息
 
-    QString getIP();
-    QString getUsr();
-    QString getMsg();
+    QString getIP();//获取IP地址
+    QString getUsr();//获取用户名
+    QString getMsg();//获取聊天信息
 
     void hasPendingFile(QString usrname, QString srvaddr,QString clntaddr, QString filename);
 
@@ -42,7 +42,7 @@ private:
 
     QColor color;
 private slots:
-    void processPendingDatagrams();
+    void processPendingDatagrams();//接收UDP消息
     void on_sendBtn_clicked();
 
     void getFileName(QString);
