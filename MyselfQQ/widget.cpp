@@ -92,7 +92,11 @@ void Widget::sndMsg(MsgType type, QString srvaddr)
     //完成对信息的处理后，最后使用writeDatagram（）进行UDP广播
     udpSocket->writeDatagram(data,data.length(),QHostAddress::Broadcast, port);
 }
-
+/*
+ * @brief   :接收UDP广播发送来的消息
+ * @author  :Lengde
+ * @date    :2024.03.17
+ */
 void Widget::processPendingDatagrams()
 {
     //判断是否有供读取的数据
@@ -156,6 +160,7 @@ void Widget::processPendingDatagrams()
 
 void Widget::usrEnter(QString usrname, QString ipaddr)
 {
+    //判断用户是否已经在用户列表中，没有才加入列表
     bool isEmpty = ui->usrTblWidget->findItems(usrname, Qt::MatchExactly).isEmpty();
     if (isEmpty) {
         QTableWidgetItem *usr = new QTableWidgetItem(usrname);
@@ -197,7 +202,11 @@ QString Widget::getUsr()
 {
     return uName;
 }
-
+/*
+ * @brief   :获取用户输入的聊天信息并进行一些设置
+ * @author  :Lengde
+ * @date    :2024.03.17
+ */
 QString Widget::getMsg()
 {
     QString msg = ui->msgTxtEdit->toHtml();

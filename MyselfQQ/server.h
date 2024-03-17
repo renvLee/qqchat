@@ -20,8 +20,8 @@ public:
     explicit Server(QWidget *parent = 0);
     ~Server();
     
-    void initSrv();
-    void refused();
+    void initSrv();//初始化服务器
+    void refused();//关闭服务器
 protected:
     void closeEvent(QCloseEvent *);
 private:
@@ -30,21 +30,21 @@ private:
     QTcpServer *tSrv;
     QString fileName;
     QString theFileName;
-    QFile *locFile;
+    QFile *locFile;//待发送的文件
 
-    qint64 totalBytes;
-    qint64 bytesWritten;
-    qint64 bytesTobeWrite;
-    qint64 payloadSize;
-    QByteArray outBlock;
+    qint64 totalBytes;//总共需要发送的字节数
+    qint64 bytesWritten;//已发送字节数
+    qint64 bytesTobeWrite;//待发送的字节数
+    qint64 payloadSize;//被初始化为一个常量
+    QByteArray outBlock;//缓存一次发送的数据
 
-    QTcpSocket *clntConn;
+    QTcpSocket *clntConn;//客户端连接的套接字
 
     QTime time;
 
 private slots:
-    void sndMsg();
-    void updClntProgress(qint64 numBytes);
+    void sndMsg();//发送数据
+    void updClntProgress(qint64 numBytes);//更新进度条
     void on_sOpenBtn_clicked();
 
     void on_sSendBtn_clicked();

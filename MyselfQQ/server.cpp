@@ -41,7 +41,11 @@ void Server::initSrv()
 
     tSrv->close();
 }
-
+/*
+ * @brief   :发送数据
+ * @author  :Lengde
+ * @date    :2024.03.17
+ */
 void Server::sndMsg()
 {
     ui->sSendBtn->setEnabled(false);
@@ -51,20 +55,28 @@ void Server::sndMsg()
     ui->sStatusLbl->setText(tr("开始传送文件 %1 ！").arg(theFileName));
 
     locFile = new QFile(fileName);
-    if(!locFile->open((QFile::ReadOnly))){
+    if(!locFile->open((QFile::ReadOnly))){//以只读方式打开文件
         QMessageBox::warning(this, tr("应用程序"), tr("无法读取文件 %1:\n%2").arg(fileName).arg(locFile->errorString()));
         return;
     }
+    //获取文件的大小
     totalBytes = locFile->size();
+    //将发送缓冲区封装outBlock封装在一个QDataStream类型的变量中，可以方便地通过“<<"操作符填写文件头结构
     QDataStream sendOut(&outBlock, QIODevice::WriteOnly);
     sendOut.setVersion(QDataStream::Qt_5_8);
     time.start();  // 开始计时
+    //通过right()去掉文件的路路径部分，仅将文件部分保存在curFile变量中
     QString curFile = fileName.right(fileName.size() - fileName.lastIndexOf('/')-1);
+    //构造一个临时的文件头，将该值追加到totalBytes字段，从而完成实际需要发送字节数的记录
     sendOut << qint64(0) << qint64(0) << curFile;
     totalBytes += outBlock.size();
+    //将读写操作指向从头开始
     sendOut.device()->seek(0);
+    //填写实际的总长度和文件长度
     sendOut << totalBytes << qint64((outBlock.size() - sizeof(qint64)*2));
+    //将文件头发出，同时修改待发送字节数bytesTobeWrite
     bytesTobeWrite = totalBytes - clntConn->write(outBlock);
+    //清空发送缓冲区，以备下次使用
     outBlock.resize(0);
 }
 
